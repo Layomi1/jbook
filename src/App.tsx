@@ -2,29 +2,35 @@ import * as esbuild from "esbuild-wasm";
 
 import { useEffect, useState } from "react";
 
-let isInitialized = false;
+let initializePromise: Promise<void> | null = null;
+
 function App() {
   const [input, setInput] = useState<string>("");
-  const [code] = useState<string>("");
+  const [code, setCode] = useState<string>("");
 
   const startService = async () => {
-    if (!isInitialized) {
-      const service = await esbuild.initialize({
+    if (!initializePromise) {
+      initializePromise = esbuild.initialize({
         worker: true,
         wasmURL: "/esbuild.wasm",
       });
-
-      isInitialized = true;
-
-      console.log(service);
     }
+
+    return initializePromise;
   };
+
   useEffect(() => {
     startService();
   }, []);
 
-  const handleSubmit = () => {
-    console.log(input);
+  const handleSubmit = async () => {
+    await startService();
+    const result = await esbuild.transform(input, {
+      loader: "jsx",
+
+      target: "es2015",
+    });
+    setCode(result.code);
   };
 
   return (
@@ -33,7 +39,7 @@ function App() {
         name="input"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-      ></textarea>
+      />
       <article>
         <button onClick={handleSubmit}>Submit</button>
       </article>
