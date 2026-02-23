@@ -9,32 +9,48 @@ export const unpkgPathPlugin = () => {
         console.log("onResolve", args);
         if (args.path === "index.tsx") {
           return { path: args.path, namespace: "a" };
-        } else if (args.path === "tiny-test-pkg") {
+        }
+
+        if (args.path.includes("./") || args.path.includes("../")) {
           return {
-            path: "https://unpkg.com/tiny-test-pkg@1.0.0/index.js",
             namespace: "a",
+
+            path: new URL(
+              args.path,
+              "https://unpkg.com" + args.resolveDir + "/",
+            ).href,
           };
         }
-      });
 
-      build.onLoad({ filter: /.*/ }, async (args) => {
-        console.log("onLoad", args);
-
-        if (args.path === "index.tsx") {
-          return {
-            loader: "jsx",
-            contents: `
-              const message = require('tiny-test-pkg');
-              console.log(message);
-            `,
-          };
-        }
-        const { data } = await axios.get(args.path);
         return {
-          loader: "jsx",
-          contents: data,
+          namespace: "a",
+          path: `https://unpkg.com/${args.path}`,
         };
       });
+
+      build.onLoad(
+        { filter: /.*/ },
+        async (args: esbuild.OnLoadArgs): Promise<esbuild.OnLoadResult> => {
+          console.log("onLoad", args);
+
+          if (args.path === "index.tsx") {
+            return {
+              loader: "jsx" as esbuild.Loader,
+              contents: `
+              const message = require('nested-test-pkg');
+              console.log(message);
+            `,
+            };
+          }
+          const { data, request } = await axios.get(args.path);
+
+          return {
+            loader: "jsx" as esbuild.Loader,
+            contents: data,
+            resolveDir: new URL("./", request.responseURL).pathname,
+          };
+        },
+      );
     },
   };
 };
