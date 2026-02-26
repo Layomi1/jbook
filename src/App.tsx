@@ -2,6 +2,7 @@ import * as esbuild from "esbuild-wasm";
 
 import { useEffect, useState } from "react";
 import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
+import { fetchPlugin } from "./plugins/fetch-plugin";
 
 let initializePromise: Promise<void> | null = null;
 
@@ -30,7 +31,7 @@ function App() {
       entryPoints: ["index.tsx"],
       bundle: true,
       write: false,
-      plugins: [unpkgPathPlugin(input)],
+      plugins: [unpkgPathPlugin(), fetchPlugin(input)],
       define: {
         "process.env.NODE_ENV": '"production"',
         global: "window",
