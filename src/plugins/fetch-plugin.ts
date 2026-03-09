@@ -17,16 +17,18 @@ export const fetchPlugin = (inputCode: string) => {
         };
       });
 
-      build.onLoad(
-        { filter: /css$/ },
-        async (args: esbuild.OnLoadArgs): Promise<esbuild.OnLoadResult> => {
-          // check to see if file has been fetched,if yes, return file immediately
-          const cachedResult = await fileCache.getItem<esbuild.OnLoadResult>(
-            args.path,
-          );
-          if (cachedResult) return cachedResult;
+      build.onLoad({ filter: /.*/ }, async (args: esbuild.OnLoadArgs) => {
+        // check to see if file has been fetched,if yes, return file immediately
+        const cachedResult = await fileCache.getItem<esbuild.OnLoadResult>(
+          args.path,
+        );
+        // if no, fetch request database,fetch request database,
+        if (cachedResult) return cachedResult;
+      });
 
-          // if no, fetch request database,fetch request database,
+      build.onLoad(
+        { filter: /.css$/ },
+        async (args: esbuild.OnLoadArgs): Promise<esbuild.OnLoadResult> => {
           const { data, request } = await axios.get(args.path);
 
           const escaped = data
@@ -55,12 +57,6 @@ export const fetchPlugin = (inputCode: string) => {
       build.onLoad(
         { filter: /.*/ },
         async (args: esbuild.OnLoadArgs): Promise<esbuild.OnLoadResult> => {
-          // check to see if file has been fetched,if yes, return file immediately
-          const cachedResult = await fileCache.getItem<esbuild.OnLoadResult>(
-            args.path,
-          );
-          if (cachedResult) return cachedResult;
-
           // if no, fetch request database,fetch request database,
           const { data, request } = await axios.get(args.path);
 
