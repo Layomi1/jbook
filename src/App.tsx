@@ -4,24 +4,22 @@ import { useEffect, useRef, useState } from "react";
 import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
 import { fetchPlugin } from "./plugins/fetch-plugin";
 
-let initializePromise: Promise<void> | null = null;
+let initializePromise: Promise<void> | undefined;
 
 function App() {
-  const iframeRef = useRef<any>();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   const [input, setInput] = useState<string>("");
-
-  const [code, setCode] = useState<string>("");
 
   const startService = async () => {
     if (!initializePromise) {
       initializePromise = esbuild.initialize({
         worker: true,
-        wasmURL: "https://unpkg.com/esbuild-wasm@latest/esbuild.wasm",
+        wasmURL: "https://unpkg.com/esbuild-wasm@0.27.3/esbuild.wasm",
       });
     }
 
-    return initializePromise;
+    await initializePromise;
   };
 
   useEffect(() => {
@@ -30,6 +28,11 @@ function App() {
 
   const handleSubmit = async () => {
     await startService();
+
+    if (iframeRef.current) {
+      iframeRef.current.srcdoc = html;
+    }
+
     const result = await esbuild.build({
       entryPoints: ["index.tsx"],
       bundle: true,
@@ -42,10 +45,12 @@ function App() {
     });
 
     // setCode(result.outputFiles[0].text);
-    iframeRef.current.contentWindow.postMessage(
-      result.outputFiles[0].text,
-      "*",
-    );
+    if (iframeRef.current?.contentWindow) {
+      iframeRef.current.contentWindow.postMessage(
+        result.outputFiles[0].text,
+        "*",
+      );
+    }
   };
 
   const html = `
@@ -55,7 +60,14 @@ function App() {
         <div id='root'></div>
         <script>
           window.addEventListener('message', (e)=>{
-            eval(e.data);
+            try{
+                eval(e.data);
+            }catch(err){
+              const root = document.querySelector("#root");
+              root.innerHTML = '<div style="color: red; "><h4>Runtime error:</h4>' + err + '</div>';
+             console.err(err);
+            }
+          
           }, false)
         </script>
       </body>
@@ -72,7 +84,7 @@ function App() {
       <article>
         <button onClick={handleSubmit}>Submit</button>
       </article>
-      <pre>{code}</pre>
+
       <iframe ref={iframeRef} sandbox="allow-scripts" srcDoc={html}></iframe>
     </div>
   );
