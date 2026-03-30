@@ -3,6 +3,7 @@ import * as esbuild from "esbuild-wasm";
 import { useEffect, useRef, useState } from "react";
 import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
 import { fetchPlugin } from "./plugins/fetch-plugin";
+import CodeEditor from "./components/code-editor";
 
 let initializePromise: Promise<void> | undefined;
 
@@ -76,11 +77,15 @@ function App() {
 
   return (
     <div>
-      <textarea
+      <CodeEditor
+        initialValue="const a= 1"
+        onChange={(value) => setInput(value)}
+      />
+      {/* <textarea
         name="input"
         value={input}
         onChange={(e) => setInput(e.target.value)}
-      />
+      /> */}
       <article>
         <button onClick={handleSubmit}>Submit</button>
       </article>
