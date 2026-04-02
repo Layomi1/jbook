@@ -45,14 +45,6 @@ const CodeEditor: FC<CodeEditorProps> = ({ initialValue, onChange }) => {
       });
     };
 
-    // const highlighter = new MonacoJSXHighlighter(
-    //   // @ts-expect-error: monaco is injected globally by loader
-    //   window.monaco,
-    //   babelParse,
-    //   codeShift,
-
-    //   editor,
-    // );
     const highlighter = new MonacoJSXHighlighter(
       // @ts-expect-error: monaco is injected globally by loader
       window.monaco,
@@ -69,7 +61,7 @@ const CodeEditor: FC<CodeEditorProps> = ({ initialValue, onChange }) => {
   const handleFormat = async () => {
     if (!editorRef.current) return;
     // get current value form editor
-    // const currentValue = editorRef.current.getModel().getValue();
+
     const currentValue = editorRef.current.getValue();
 
     //format the given value
