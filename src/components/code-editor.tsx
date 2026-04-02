@@ -1,5 +1,6 @@
 import { useRef, type FC } from "react";
 import "./code-editor.css";
+import "./syntax.css";
 
 import Editor, { loader, type OnMount } from "@monaco-editor/react";
 import type { editor } from "monaco-editor";
@@ -7,7 +8,6 @@ import prettier from "prettier/standalone";
 import parserBabel from "prettier/plugins/babel";
 
 import parserEstree from "prettier/plugins/estree";
-// import codeShift from "jscodeshift";
 import traverse from "@babel/traverse";
 import { parse } from "@babel/parser";
 import MonacoJSXHighlighter from "monaco-jsx-highlighter";
