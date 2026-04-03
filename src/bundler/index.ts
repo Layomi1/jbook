@@ -1,0 +1,31 @@
+import * as esbuild from "esbuild-wasm";
+import { unpkgPathPlugin } from "./plugins/unpkg-path-plugin";
+import { fetchPlugin } from "./plugins/fetch-plugin";
+
+let service: Promise<void> | undefined;
+
+const bundle = async (rawCode: string) => {
+  console.log("RAW CODE:", rawCode);
+  if (!service) {
+    service = esbuild.initialize({
+      worker: true,
+      wasmURL: "https://unpkg.com/esbuild-wasm@0.27.3/esbuild.wasm",
+    });
+    await service;
+  }
+
+  const result = await esbuild.build({
+    entryPoints: ["index.tsx"],
+    bundle: true,
+    write: false,
+    plugins: [unpkgPathPlugin(), fetchPlugin(rawCode)],
+    define: {
+      "process.env.NODE_ENV": '"production"',
+      global: "window",
+    },
+  });
+
+  return result.outputFiles[0].text;
+};
+
+export default bundle;

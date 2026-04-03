@@ -38,11 +38,18 @@ const CodeEditor: FC<CodeEditorProps> = ({ initialValue, onChange }) => {
     if (!model) return;
 
     const babelParse = (code: string) => {
-      return parse(code, {
-        sourceType: "module",
-        plugins: ["jsx", "typescript"],
-        errorRecovery: true,
-      });
+      try {
+        if (!code || typeof code !== "string") return null;
+
+        return parse(code, {
+          sourceType: "module",
+          plugins: ["jsx", "typescript"],
+          errorRecovery: true,
+        });
+      } catch (err) {
+        console.log(err);
+        return null;
+      }
     };
 
     const highlighter = new MonacoJSXHighlighter(
