@@ -1,4 +1,5 @@
 import { useEffect, useRef, type FunctionComponent } from "react";
+import "./preview.css";
 
 type PreviewProps = {
   code: string;
@@ -39,12 +40,14 @@ const Preview: FunctionComponent<PreviewProps> = ({ code }) => {
   }, [code]);
 
   return (
-    <iframe
-      title="preview"
-      ref={iframeRef}
-      sandbox="allow-scripts"
-      srcDoc={html}
-    />
+    <section className="preview-wrapper">
+      <iframe
+        title="preview"
+        ref={iframeRef}
+        sandbox="allow-scripts"
+        srcDoc={html}
+      />
+    </section>
   );
 };
 
