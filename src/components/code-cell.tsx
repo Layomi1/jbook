@@ -1,36 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./code-cell.css";
-// import bundle from "../bundler";
+import bundle from "../bundler";
 import CodeEditor from "./code-editor";
 import Preview from "./preview";
 import Resizable from "./resizable";
 
 const CodeCell = () => {
   const [code, setCode] = useState<string>("");
-  // const [input, setInput] = useState<string>("");
+  const [err, setErr] = useState<string>("");
+  const [input, setInput] = useState<string>("");
 
-  // useEffect(() => {
-  //   const timer = setTimeout(async () => {
-  //     const output = await bundle(input);
+  useEffect(() => {
+    const timer = setTimeout(async () => {
+      const output = await bundle(input);
 
-  //     setCode(output);
-  //   }, 500);
-  //   return clearTimeout(timer);
-  // }, [input]);
+      setCode(output.code);
+      setErr(output.err);
+    }, 500);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [input]);
 
   return (
     <Resizable direction="vertical">
       <div className="code-cell-container">
-        <CodeEditor
-          initialValue=""
-          onChange={(value) => {
-            setInput(value);
-          }}
-        />
+        <Resizable direction="horizontal">
+          <CodeEditor
+            initialValue=""
+            onChange={(value) => {
+              setInput(value);
+            }}
+          />
+        </Resizable>
 
-        {/* <article> */}
-        <Preview code={code} />
-        {/* </article> */}
+        <Preview code={code} bundlingError={err} />
       </div>
     </Resizable>
   );

@@ -3,6 +3,7 @@ import "./preview.css";
 
 type PreviewProps = {
   code: string;
+  bundlingError: string;
 };
 
 const html = `
@@ -11,22 +12,30 @@ const html = `
       <body>
         <div id='root'></div>
         <script>
+        const handleError = (err) => {
+          const root = document.querySelector("#root");
+              root.innerHTML = '<div style="color: red; "><h4>Runtime error:</h4>' + err + '</div>';
+             console.err(err);
+        }
+
+          window.addEventListener('error',(event) => { 
+            event.preventDefault();
+            handleError(event.error)
+          });
+
           window.addEventListener('message', (e)=>{
             try{
                 eval(e.data);
             }catch(err){
-              const root = document.querySelector("#root");
-              root.innerHTML = '<div style="color: red; "><h4>Runtime error:</h4>' + err + '</div>';
-             console.err(err);
+              handleError(err)
             }
-          
           }, false)
         </script>
       </body>
     </html>
 `;
 
-const Preview: FunctionComponent<PreviewProps> = ({ code }) => {
+const Preview: FunctionComponent<PreviewProps> = ({ code, bundlingError }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
@@ -34,11 +43,14 @@ const Preview: FunctionComponent<PreviewProps> = ({ code }) => {
       iframeRef.current.srcdoc = html;
     }
 
-    if (iframeRef.current?.contentWindow) {
-      iframeRef.current.contentWindow.postMessage(code, "*");
-    }
+    setTimeout(() => {
+      if (iframeRef.current?.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(code, "*");
+      }
+    }, 50);
   }, [code]);
 
+  console.log(bundlingError);
   return (
     <section className="preview-wrapper">
       <iframe
@@ -47,6 +59,9 @@ const Preview: FunctionComponent<PreviewProps> = ({ code }) => {
         sandbox="allow-scripts"
         srcDoc={html}
       />
+      {bundlingError && (
+        <article className="preview-error">{bundlingError}</article>
+      )}
     </section>
   );
 };
