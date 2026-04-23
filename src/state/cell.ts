@@ -1,7 +1,7 @@
-export type CellTypes = "code" | "text";
+export type CellType = "code" | "text";
 
 export interface Cell {
   id: string;
-  type: CellTypes;
+  type: CellType;
   content: string;
 }
