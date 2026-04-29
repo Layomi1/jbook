@@ -3,14 +3,22 @@ import type { Cell } from "../../state/cell";
 
 import TextEditor from "../text-editor/text-editor";
 import CodeCell from "../code-cell";
-import { useActions } from "../../hooks/use-actions";
+// import { useActions } from "../../hooks/use-actions";
 
 interface CellListItemProps {
   cell: Cell;
 }
 const CellListItem: FunctionComponent<CellListItemProps> = ({ cell }) => {
-  const {} = useActions();
-  return <div>{cell.type === "code" ? <CodeCell /> : <TextEditor />}</div>;
+  // const {} = useActions();
+  return (
+    <div>
+      {cell.type === "code" ? (
+        <CodeCell cell={cell} />
+      ) : (
+        <TextEditor cell={cell} />
+      )}
+    </div>
+  );
 };
 
 export default CellListItem;
