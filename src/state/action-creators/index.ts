@@ -45,3 +45,10 @@ export const insertCellBefore = (
     },
   };
 };
+
+export const actionCreators = {
+  deleteCell,
+  updateCell,
+  moveCell,
+  insertCellBefore,
+};
