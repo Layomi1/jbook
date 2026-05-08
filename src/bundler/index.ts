@@ -5,7 +5,6 @@ import { fetchPlugin } from "./plugins/fetch-plugin";
 let service: Promise<void> | undefined;
 
 const bundle = async (rawCode: string) => {
-  console.log("RAW CODE:", rawCode);
   if (!service) {
     service = esbuild.initialize({
       worker: true,

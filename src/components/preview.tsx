@@ -50,7 +50,7 @@ const Preview: FunctionComponent<PreviewProps> = ({ code, bundlingError }) => {
     }, 50);
   }, [code]);
 
-  console.log(bundlingError);
+  // console.log(bundlingError);
   return (
     <section className="preview-wrapper">
       <iframe

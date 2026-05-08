@@ -41,7 +41,7 @@ const cellReducer = (
         const index = draft.order.findIndex((id) => id === action.payload.id);
         const targetIndex = direction === "up" ? index - 1 : index + 1;
 
-        if (targetIndex < 0 || targetIndex > draft.order.length) return draft;
+        if (targetIndex < 0 || targetIndex >= draft.order.length) return draft;
 
         draft.order[index] = draft.order[targetIndex];
         draft.order[targetIndex] = action.payload.id;
