@@ -48,7 +48,7 @@ const cellReducer = (
         break;
       }
 
-      case ActionType.INSERT_CELL_BEFORE: {
+      case ActionType.INSERT_CELL_AFTER: {
         const cell: Cell = {
           id: randomId(),
           type: action.payload.type,
@@ -61,9 +61,9 @@ const cellReducer = (
         );
 
         if (foundIndex < 0) {
-          draft.order.push(cell.id);
+          draft.order.unshift(cell.id);
         } else {
-          draft.order.splice(foundIndex, 0, cell.id);
+          draft.order.splice(foundIndex + 1, 0, cell.id);
         }
         break;
       }
